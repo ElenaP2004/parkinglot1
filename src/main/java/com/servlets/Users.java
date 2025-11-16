@@ -3,17 +3,16 @@ package com.servlets;
 import com.common.UsersDto;
 import com.ejb.UsersBean;
 import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "Users", value = "/Users")
 public class Users extends HttpServlet {
+
     @Inject
     private UsersBean usersBean;
 
@@ -21,11 +20,12 @@ public class Users extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<UsersDto> users = usersBean.findAllUsers();
         request.setAttribute("users", users);
+        request.setAttribute("numberOfFreeUsers", 10);
         request.getRequestDispatcher("/WEB-INF/pages/users.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-}
+    }
 }

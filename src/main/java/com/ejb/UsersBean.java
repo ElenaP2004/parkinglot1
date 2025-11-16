@@ -1,4 +1,5 @@
 package com.ejb;
+
 import com.common.UsersDto;
 import entities.Users;
 import jakarta.ejb.Stateless;
@@ -22,9 +23,11 @@ public class UsersBean {
         try {
             TypedQuery<Users> typedQuery = entityManager.createQuery("SELECT u FROM Users u", Users.class);
             List<Users> users = typedQuery.getResultList();
+            LOG.info("Found " + users.size() + " users");
             return copyUsersToDto(users);
         } catch (Exception ex) {
             LOG.severe(ex.getMessage());
+            ex.printStackTrace();
             return new ArrayList<>();
         }
     }
@@ -40,6 +43,5 @@ public class UsersBean {
             usersDtos.add(usersDto);
         }
         return usersDtos;
+    }
 }
-}
-
