@@ -1,12 +1,12 @@
 package com.servlets;
 
-import com.common.UsersDto;
-import com.ejb.UsersBean;
+
+import com.ejb.UserBean;
+import com.common.UserDto;
 import jakarta.inject.Inject;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -14,18 +14,15 @@ import java.util.List;
 public class Users extends HttpServlet {
 
     @Inject
-    private UsersBean usersBean;
+    UserBean userBean;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<UsersDto> users = usersBean.findAllUsers();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        List<UserDto> users = userBean.findAllUsers();
         request.setAttribute("users", users);
-        request.setAttribute("numberOfFreeUsers", 10);
+
         request.getRequestDispatcher("/WEB-INF/pages/users.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
+}
 }

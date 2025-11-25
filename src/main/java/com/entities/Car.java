@@ -1,4 +1,4 @@
-package entities;
+package com.entities;
 
 import jakarta.persistence.*;
 
@@ -12,7 +12,7 @@ public class Car {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
-    private Users owner;
+    private User owner;
 
     public Long getId() {
         return id;
@@ -36,11 +36,11 @@ public class Car {
     @Column(name="parkingSpot")
     private String parkingSpot;
 
-    public Users getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(Users owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 

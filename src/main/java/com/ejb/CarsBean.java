@@ -1,7 +1,8 @@
 package com.ejb;
 
 import com.common.CarDto;
-import entities.Car;
+import com.entities.Car;
+import com.entities.User;
 import jakarta.ejb.EJBException;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -19,36 +20,74 @@ public class CarsBean {
     @PersistenceContext
     EntityManager entityManager;
 
+    private List<CarDto> copyCarsToDto(List<Car> cars) {
+        List<CarDto> carDtos = new ArrayList<>();
+
+        for (Car car : cars) {
+            CarDto carDto = new CarDto(
+                    car.getId(),
+                    car.getLicensePlate(),
+                    car.getParkingSpot(),
+                    car.getOwner().getUsername()
+            );
+            carDtos.add(carDto);
+        }
+
+        return carDtos;
+    }
+
     public List<CarDto> findAllCars() {
         LOG.info("findAllCars");
         try {
             TypedQuery<Car> typedQuery = entityManager.createQuery("SELECT c FROM Car c", Car.class);
+
             List<Car> cars = typedQuery.getResultList();
             return copyCarsToDto(cars);
         } catch (Exception ex) {
             throw new EJBException(ex);
         }
     }
+    public CarDto findById(Long carId) {
+        Car car = entityManager.find(Car.class, carId);
+        return new CarDto(car.getId(), car.getLicensePlate(), car.getParkingSpot(), car.getOwner().getUsername());
+    }
 
-    private List<CarDto> copyCarsToDto(List<Car> cars) {
-        List<CarDto> carDtos = new ArrayList<>();
 
-        for (Car car : cars) {
-            CarDto carDto = new CarDto();
-            carDto.setId(car.getId());
-            carDto.setLicensePlate(car.getLicensePlate());
-            carDto.setParkingSpot(car.getParkingSpot());
+    public void createCar(String licensePlate, String parkingSpot, Long userId) {
+        LOG.info("createCar: " + licensePlate + ", " + parkingSpot + ", userId: " + userId);
 
-            // Verifică dacă owner există înainte de a accesa username
-            if (car.getOwner() != null) {
-                carDto.setOwnerName(car.getOwner().getUsername());
-            } else {
-                carDto.setOwnerName("Unknown");
-            }
+        Car car = new Car();
+        car.setLicensePlate(licensePlate);
+        car.setParkingSpot(parkingSpot);
 
-            carDtos.add(carDto);
+        // Găsim utilizatorul după ID
+        User user = entityManager.find(User.class, userId);
+
+        if (user != null) {
+            car.setOwner(user);
+            user.getCars().add(car);
+            LOG.info("Car owner set to: " + user.getUsername());
+        } else {
+            LOG.warning("User not found with id: " + userId);
         }
 
-        return carDtos;
+        // Salvăm mașina în baza de date
+        entityManager.persist(car);
+        LOG.info("Car persisted successfully");
     }
+
+    public void updateCar(Long carId, String licensePlate, String parkingSpot, Long userId) {
+        Car car = entityManager.find(Car.class, carId);
+        car.setLicensePlate(licensePlate);
+        car.setParkingSpot(parkingSpot);
+
+        // remove this car from the old owner
+        User oldOwner = car.getOwner();
+        oldOwner.getCars().remove(car);
+
+        // add the car to its new owner
+        User newOwner = entityManager.find(User.class, userId);
+        newOwner.getCars().add(car);
+        car.setOwner(newOwner);
+}
 }

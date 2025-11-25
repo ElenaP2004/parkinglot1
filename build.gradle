@@ -14,14 +14,16 @@ ext {
     junitVersion = '5.10.2'
 }
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 dependencies {
+    // Dependințele GlassFish și Jakarta EE 10
     compileOnly('jakarta.platform:jakarta.jakartaee-api:10.0.0')
     compileOnly('org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1')
 
