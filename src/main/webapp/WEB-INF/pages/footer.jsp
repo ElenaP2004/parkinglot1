@@ -1,3 +1,3 @@
-<footer class="text-center py-3 my-4 border-top" style="background:#f8f9fa; color:#6c757d;">
-    &copy; 2025 Popescu Elena
+<footer class="container" style="text-align: center;">
+    <p>&copy; 2025 Popescu Elena Andra</p>
 </footer>

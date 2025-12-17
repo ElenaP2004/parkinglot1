@@ -3,7 +3,7 @@ plugins {
     id 'war'
 }
 
-group 'org.parkinglot'
+group 'com.parking'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -11,26 +11,22 @@ repositories {
 }
 
 ext {
-    junitVersion = '5.10.2'
+    junitVersion = '5.13.2'
 }
 
-
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '8'
+targetCompatibility = '8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 dependencies {
-    // Dependințele GlassFish și Jakarta EE 10
-    compileOnly('jakarta.platform:jakarta.jakartaee-api:10.0.0')
+    compileOnly('jakarta.platform:jakarta.jakartaee-api:11.0.0')
     compileOnly('org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1')
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
 
 test {
-    useJUnitPlatform()
-}
+    useJUnitPlatform()}

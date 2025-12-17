@@ -1,17 +1,25 @@
 package com.common;
 
 public class UserDto {
-    Long id;
-    String username;
-    String email;
+    private Long id;
+    private String username;
+    private String email;
 
-    public UserDto(Long id, String username, String email) {
+    public UserDto(String email, Long id, String username) {
+        this.email = email;
         this.id = id;
         this.username = username;
-        this.email = email;
     }
 
-    public Long getId() { return id; }
-    public String getUsername() { return username; }
-    public String getEmail() { return email;}
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 }
