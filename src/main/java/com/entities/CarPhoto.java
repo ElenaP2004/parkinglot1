@@ -1,50 +1,40 @@
 package com.entities;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "car_photo")
-public class CarPhoto {
+public class CarPhoto implements Serializable {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ✅ NECESAR PENTRU MySQL
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Lob
-    @Column(name = "file_content")
-    private byte[] fileContent;
-
-    @Column(name = "file_type")
-    private String fileType;
-
-    private Car car;
 
     @Column(name = "filename")
     private String filename;
 
-    @OneToOne
-    public Car getCar() {
-        return car;
+    @Column(name = "file_type")
+    private String fileType;
+
+    @Lob
+    @Column(name = "photo")
+    private byte[] fileContent;
+
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id")
+    private Car car;
+
+    // --- Getters și Setters ---
+
+    public Long getId() {
+        return id;
     }
 
-    public void setCar(Car car) {
-        this.car = car;
-    }
-
-    public byte[] getFileContent() {
-        return fileContent;
-    }
-
-    public void setFileContent(byte[] fileContent) {
-        this.fileContent = fileContent;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFilename() {
@@ -55,12 +45,27 @@ public class CarPhoto {
         this.filename = filename;
     }
 
-    public Long getId() {
-        return id;
+    public String getFileType() {
+        return fileType;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
+    public byte[] getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
 }

@@ -17,14 +17,13 @@ public class CarPhotos extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
-        Integer carId = Integer.parseInt(request.getParameter("id"));
-        CarPhotoDto photo= carsBean.findPhotoByCarId(carId);
-        if(photo!=null){
+        Long carId = Long.parseLong(request.getParameter("id"));
+        CarPhotoDto photo = carsBean.findPhotoByCarId(carId);
+        if (photo != null) {
             response.setContentType(photo.getFileType());
             response.setContentLength(photo.getFileContent().length);
             response.getOutputStream().write(photo.getFileContent());
-        }
-        else{
+        } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }

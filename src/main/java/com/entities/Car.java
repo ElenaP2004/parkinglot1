@@ -1,35 +1,56 @@
 package com.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "cars")
-public class Car {
+public class Car implements Serializable {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Size(min=3,max=100)
-    @Column(name = "LicensePlate",unique = true,nullable = false, length = 100)
-    private String LicensePlate;
-    @Size(min=1,max=100)
-    @Column(name = "parkingSpot",unique = true,nullable = false, length = 100)
+
+
+    @Column(name = "license_plate", nullable = false)
+    private String licensePlate;
+
+
+    @Column(name = "parking_spot", nullable = false)
     private String parkingSpot;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "owner_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id") // Legătura cu userul
     private User owner;
-    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CarPhoto photo;
 
+    // --- Getters și Setters ---
 
-    public CarPhoto getPhoto() {
-        return photo;
+    public Long getId() {
+        return id;
     }
 
-    public void setPhoto(CarPhoto photo) {
-        this.photo = photo;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    public String getParkingSpot() {
+        return parkingSpot;
+    }
+
+    public void setParkingSpot(String parkingSpot) {
+        this.parkingSpot = parkingSpot;
     }
 
     public User getOwner() {
@@ -40,29 +61,11 @@ public class Car {
         this.owner = owner;
     }
 
-
-    public String getParkingSpot() {
-        return parkingSpot;
+    public CarPhoto getPhoto() {
+        return photo;
     }
 
-    public void setParkingSpot(String parkingSpot) {
-        this.parkingSpot = parkingSpot;
+    public void setPhoto(CarPhoto photo) {
+        this.photo = photo;
     }
-
-
-    public String getLicensePlate() {
-        return LicensePlate;
-    }
-
-    public void setLicensePlate(String licensePlate) {
-        LicensePlate = licensePlate;
-    }
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 }

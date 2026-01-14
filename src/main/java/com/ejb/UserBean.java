@@ -14,25 +14,45 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
+
 @Stateless
 public class UserBean {
     @Inject
     PasswordBean passwordBean;
+
     private static final Logger LOG = Logger.getLogger(com.ejb.UserBean.class.getName());
+
     @PersistenceContext
     private EntityManager entityManager;
 
     public List<UserDto> findAllUsers() {
         LOG.info("findAllUsers");
-        try{
-            TypedQuery<User> typedQuery =entityManager.createQuery("SELECT u FROM User u", User.class);
+        try {
+            TypedQuery<User> typedQuery = entityManager.createQuery("SELECT u FROM User u", User.class);
             List<User> users = typedQuery.getResultList();
             return copyUsersToDto(users);
         } catch (Exception ex) {
             throw new EJBException(ex);
         }
-
     }
+
+    public UserDto findById(Long userId) {
+        LOG.info("findById: " + userId);
+        try {
+            User user = entityManager.find(User.class, userId);
+            if (user != null) {
+                return new UserDto(
+                        user.getEmail(),
+                        user.getId(),
+                        user.getUsername()
+                );
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new EJBException(ex);
+        }
+    }
+
     private List<UserDto> copyUsersToDto(List<User> users) {
         List<UserDto> dtos = new ArrayList<>();
         for (User user : users) {
@@ -40,21 +60,25 @@ public class UserBean {
                     user.getEmail(),
                     user.getId(),
                     user.getUsername()
-
             );
             dtos.add(dto);
         }
         return dtos;
     }
+
     public void createUser(String username, String email, String password, Collection<String> groups) {
         LOG.info("createUser");
+        // 1. Creăm utilizatorul
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
         newUser.setPassword(passwordBean.convertToSha256(password));
         entityManager.persist(newUser);
+
+        // 2. Îi asignăm grupurile (manual, în tabela separată)
         assignGroupsToUser(username, groups);
     }
+
     private void assignGroupsToUser(String username, Collection<String> groups) {
         LOG.info("assignGroupsToUser");
         for (String group : groups) {
@@ -64,6 +88,7 @@ public class UserBean {
             entityManager.persist(userGroup);
         }
     }
+
     public Collection<String> findUsernamesByUserIds(Collection<Long> userIds) {
         LOG.info("findUsernamesByUserIds");
         List<String> usernames =
@@ -72,6 +97,7 @@ public class UserBean {
                         .getResultList();
         return usernames;
     }
+
     public void updateUser(Long userId, String username, String email, String newPassword) {
         LOG.info("updateUser");
         User user = entityManager.find(User.class, userId);
@@ -84,4 +110,3 @@ public class UserBean {
         }
     }
 }
-

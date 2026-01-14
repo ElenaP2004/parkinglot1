@@ -1,33 +1,32 @@
 package com.entities;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "usergroups")
-public class UserGroup {
+public class UserGroup implements Serializable {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "userGroup")
+    @Column(name = "userGroup", nullable = false)
     private String userGroup;
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @ManyToMany(mappedBy = "userGroups")
-    private List<User> users = new ArrayList<>();
+    // ❌ AM ȘTERS: Lista de Users și @ManyToMany.
+    // Nu avem nevoie de ea și cauza eroarea 500.
 
-    public List<User> getUsers() {
-        return users;
+    public Long getId() {
+        return id;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUserGroup() {
@@ -45,14 +44,4 @@ public class UserGroup {
     public void setUsername(String username) {
         this.username = username;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 }

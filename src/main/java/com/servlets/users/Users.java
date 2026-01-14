@@ -3,7 +3,7 @@ package com.servlets.users;
 import com.common.UserDto;
 import com.ejb.InvoiceBean;
 import com.ejb.UserBean;
-import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.DeclareRoles; // Adaugă importul ăsta
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.HttpConstraint;
@@ -15,54 +15,65 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+// 1. Declarăm rolurile (Good Practice)
 @DeclareRoles({"READ_USERS", "WRITE_USERS", "INVOICING"})
-@ServletSecurity(value = @HttpConstraint(rolesAllowed = {"READ_USERS"}),
-        httpMethodConstraints = {@HttpMethodConstraint(value = "POST", rolesAllowed = {"WRITE_USERS", "INVOICING"})})
+
 @WebServlet(name = "Users", value = "/Users")
+@ServletSecurity(
+        value = @HttpConstraint(rolesAllowed = {"READ_USERS"}),
+        httpMethodConstraints = {
+                // 2. AICI ERA GREȘEALA: Trebuie să permiți și INVOICING la POST!
+                @HttpMethodConstraint(value = "POST", rolesAllowed = {"WRITE_USERS", "INVOICING"})
+        }
+)
 public class Users extends HttpServlet {
     @Inject
-    UserBean userBean ;
+    private UserBean usersBean;
+
     @Inject
-    InvoiceBean invoiceBean;
+    private InvoiceBean invoiceBean;
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
-            ServletException, IOException {
-        List<UserDto> users = userBean.findAllUsers();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<UserDto> users = usersBean.findAllUsers();
         request.setAttribute("users", users);
-        if(!invoiceBean.getUserIds().isEmpty()){
-            Collection<String> usernames =userBean.findUsernamesByUserIds(invoiceBean.getUserIds());
-            request.setAttribute("invoices", usernames);
+
+        if (request.isUserInRole("INVOICING")) {
+
+            request.setAttribute("invoiceUserIds", invoiceBean.getUserIds());
+
+
+            if (!invoiceBean.getUserIds().isEmpty()) {
+                Collection<String> invoiceUsernames = usersBean.findUsernamesByUserIds(invoiceBean.getUserIds());
+                request.setAttribute("invoices", invoiceUsernames);
+            }
         }
-        request.setAttribute("activePage", "Users");
-        request.getRequestDispatcher("/WEB-INF/pages/users/users.jsp").forward(request,response);
 
 
-
+        request.getRequestDispatcher("/WEB-INF/pages/users/users.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
-            ServletException, IOException {
-        String[] userIdsAsString = request.getParameterValues("user_ids");
-        String action = request.getParameter("action");
-        if ("invoice".equals(action)) {
-            if (!request.isUserInRole("INVOICING")) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to invoice.");
-                return;
-            }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        if (request.isUserInRole("INVOICING")) {
+            String[] userIdsAsString = request.getParameterValues("user_ids");
+
+
+            invoiceBean.getUserIds().clear();
+
             if (userIdsAsString != null) {
-                List<Long> userIds = new ArrayList<>();
-                for (String userIdAsString : userIdsAsString) {
-                    userIds.add(Long.parseLong(userIdAsString));
+                for (String userIdString : userIdsAsString) {
+                    invoiceBean.getUserIds().add(Long.parseLong(userIdString));
                 }
-                invoiceBean.getUserIds().addAll(userIds);
             }
         }
+
         response.sendRedirect(request.getContextPath() + "/Users");
     }
 }
-
-

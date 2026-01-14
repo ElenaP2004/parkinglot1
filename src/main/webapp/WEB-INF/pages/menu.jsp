@@ -11,16 +11,14 @@
                         <a class="nav-link
                         ${pageContext.request.requestURI.substring(pageContext.request.requestURI.lastIndexOf("/"))eq '/about.jsp' ? ' active' : ''}" aria-current="page" href="${pageContext.request.contextPath}/about.jsp">About</a>
                     </li>
-                    <li class="nav-item">
-                        <c:if test="${pageContext.request.isUserInRole('READ_CARS')}">
+                    <c:if test="${pageContext.request.getRemoteUser() != null}">
+                        <li class="nav-item">
                             <a class="nav-link ${activePage eq 'Cars' ? 'active' : ''}" href="${pageContext.request.contextPath}/Cars">Cars</a>
-                        </c:if>
-                    </li>
-                    <li class="nav-item">
-                        <c:if test="${pageContext.request.isUserInRole('READ_USERS')}">
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link ${activePage eq 'Users' ? 'active' : ''}" href="${pageContext.request.contextPath}/Users">Users</a>
-                        </c:if>
-                    </li>
+                        </li>
+                    </c:if>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
